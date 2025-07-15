@@ -1,0 +1,5 @@
+.app { text-align: center; font-family: sans-serif; }
+form { margin: 20px; }
+textarea { width: 80%; }
+.report { border: 1px solid #ccc; padding: 20px; margin: 20px; }
+span { color: red; font-weight: bold; }  /* 하이라이트 스타일 */

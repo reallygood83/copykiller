@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import UploadForm from './components/UploadForm';
 import Report from './components/Report';
-import './components/styles.css';
 
 function App() {
   const [result, setResult] = useState(null);

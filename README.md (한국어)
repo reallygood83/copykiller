@@ -1,0 +1,13 @@
+# 표절 및 AI 탐지 서비스 (프로젝트 키메라)
+
+## 설치
+1. backend/ 에서 npm install
+2. frontend/ 에서 npm install
+3. .env 에 API 키 입력
+
+## 실행
+- 백엔드: npm start (포트 5000)
+- 프론트: npm start (포트 3000)
+
+## 배포
+Vercel에서 GitHub 연결 후 deploy. vercel.json 에서 backend를 API로 설정.

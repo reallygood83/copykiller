@@ -1,21 +1,27 @@
-const express = require('express');
-const cors = require('cors');
 const plagiarismModule = require('./plagiarism');
-const path = require('path');
 
-const app = express();
+// Vercel Serverless 함수
+module.exports = async (req, res) => {
+  // CORS 헤더 설정
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
 
-// CORS 설정
-app.use(cors({
-  origin: ['http://localhost:3000', 'https://copykiller-a3lidiwgm-moon-jungs-projects.vercel.app'],
-  credentials: true
-}));
+  // OPTIONS 요청 처리
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
 
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+  // POST 요청만 처리
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-// 분석 엔드포인트
-app.post('/api/analyze', async (req, res) => {
   try {
     const { text, apiKey } = req.body;
     
@@ -37,7 +43,7 @@ app.post('/api/analyze', async (req, res) => {
     
     const result = await plagiarismModule.detectPlagiarismAndAI(text, apiKey);
     
-    res.json({
+    res.status(200).json({
       success: true,
       data: result
     });
@@ -49,33 +55,4 @@ app.post('/api/analyze', async (req, res) => {
       error: '분석 중 오류가 발생했습니다: ' + error.message
     });
   }
-});
-
-// 건강 상태 확인
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    service: '키메라 2.0 표절탐지기+글쓰기 멘토'
-  });
-});
-
-// PDF 리포트 다운로드
-app.get('/api/reports/:filename', (req, res) => {
-  try {
-    const filename = req.params.filename;
-    const filePath = path.join('/tmp', filename);
-    
-    res.download(filePath, (err) => {
-      if (err) {
-        console.error('파일 다운로드 오류:', err);
-        res.status(404).json({ error: '파일을 찾을 수 없습니다.' });
-      }
-    });
-  } catch (error) {
-    console.error('리포트 다운로드 오류:', error);
-    res.status(500).json({ error: '다운로드 중 오류가 발생했습니다.' });
-  }
-});
-
-module.exports = app;
+};

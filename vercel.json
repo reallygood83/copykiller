@@ -2,24 +2,7 @@
   "version": 2,
   "buildCommand": "cd frontend && npm ci && npm run build",
   "outputDirectory": "frontend/build",
-  "functions": {
-    "backend/index.js": {
-      "maxDuration": 60
-    }
-  },
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/backend/index.js"
-    },
-    {
-      "src": "/reports/(.*)", 
-      "dest": "/backend/index.js"
-    },
-    {
-      "src": "/health",
-      "dest": "/backend/index.js"
-    },
     {
       "handle": "filesystem"
     },

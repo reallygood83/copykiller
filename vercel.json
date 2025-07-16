@@ -1,29 +1,19 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build",
-        "buildCommand": "cd frontend && npm ci && npm run build"
-      }
-    },
-    {
-      "src": "backend/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
+  "buildCommand": "cd frontend && npm ci && npm run build",
+  "outputDirectory": "frontend/build",
+  "functions": {
+    "backend/index.js": {
+      "maxDuration": 60
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "/backend/index.js"
     },
     {
-      "src": "/reports/(.*)",
+      "src": "/reports/(.*)", 
       "dest": "/backend/index.js"
     },
     {
@@ -31,23 +21,11 @@
       "dest": "/backend/index.js"
     },
     {
-      "src": "/favicon.ico",
-      "dest": "/frontend/build/favicon.ico",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "src": "/manifest.json", 
-      "dest": "/frontend/build/manifest.json"
-    },
-    {
-      "src": "/static/(.*)",
-      "dest": "/frontend/build/static/$1"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "/frontend/build/index.html"
+      "dest": "/index.html"
     }
   ],
   "env": {

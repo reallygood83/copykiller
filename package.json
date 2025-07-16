@@ -1,11 +1,11 @@
 {
   "name": "copykiller",
-  "version": "1.0.0",
-  "description": "표절 및 AI 탐지 서비스",
+  "version": "2.0.0", 
+  "description": "키메라 2.0 - 표절탐지기+글쓰기 멘토 시스템",
   "main": "backend/index.js",
   "scripts": {
     "start": "node backend/index.js",
-    "build": "cd frontend && npm install && npm run build",
+    "build": "cd frontend && npm ci && npm run build",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm start",

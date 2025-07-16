@@ -6,15 +6,16 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "axios": "^1.6.2",
-    "pdfkit": "^0.14.0",
-    "natural": "^6.10.4",
+    "@fontsource/noto-sans-kr": "^5.2.6",
     "@google/generative-ai": "^0.1.1",
-    "node-html-parser": "^6.1.12",
+    "axios": "^1.6.2",
     "cheerio": "^1.0.0-rc.12",
-    "string-similarity": "^4.0.4",
-    "dotenv": "^16.3.1"
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "natural": "^6.10.4",
+    "node-html-parser": "^6.1.12",
+    "pdfkit": "^0.14.0",
+    "string-similarity": "^4.0.4"
   }
 }

@@ -19,6 +19,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // 정적 파일 서빙 (PDF 보고서용)
 app.use('/reports', express.static(path.join(__dirname, 'reports')));
 
+// 프론트엔드 정적 파일 서빙
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
 // API 라우트
 app.use('/api', routes);
 
@@ -31,12 +34,19 @@ app.get('/health', (req, res) => {
   });
 });
 
+// 모든 요청을 React 앱으로 리다이렉트 (SPA를 위한 catch-all)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+});
+
 // Vercel 배포를 위한 기본 익스포트
 module.exports = app;
 
-// 로컬 개발 환경에서만 서버 시작
-if (process.env.NODE_ENV !== 'production') {
+// 항상 서버 시작 (Vercel이 아닌 경우)
+if (!process.env.VERCEL) {
   app.listen(port, () => {
-    console.log(`서버가 포트 ${port}에서 실행 중입니다.`);
+    console.log(`🔍 키메라 2.0 서버가 포트 ${port}에서 실행 중입니다.`);
+    console.log(`🌐 웹 인터페이스: http://localhost:${port}`);
+    console.log(`🔧 API 엔드포인트: http://localhost:${port}/api`);
   });
 }

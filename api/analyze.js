@@ -29,9 +29,9 @@ async function detectPlagiarismAndAI(text, apiKey) {
       /이를 통해.*할 수 있습니다/g
     ];
     
-    let aiScore = 0;
+    let aiScore = 0.15; // 기본값 설정
     aiPatterns.forEach(pattern => {
-      if (pattern.test(text)) aiScore += 0.1;
+      if (pattern.test(text)) aiScore += 0.15;
     });
 
     // 문장 길이 일관성 체크
@@ -39,7 +39,13 @@ async function detectPlagiarismAndAI(text, apiKey) {
       aiScore += 0.2;
     }
 
-    results.aiProbability = Math.min(aiScore, 0.8);
+    // 표절률 기본값 설정 (간단한 휴리스틱)
+    const commonPhrases = text.match(/\b\w{5,}\b/g) || [];
+    const uniquePhrases = new Set(commonPhrases);
+    const repetitionRate = 1 - (uniquePhrases.size / commonPhrases.length);
+    results.plagiarismRate = Math.min(repetitionRate * 0.5 + 0.1, 0.9);
+
+    results.aiProbability = Math.min(aiScore, 0.9);
 
     // 3. Gemini CLI를 사용한 표절 검사 (가능한 경우)
     if (apiKey || process.env.GEMINI_API_KEY) {
@@ -67,8 +73,12 @@ async function detectPlagiarismAndAI(text, apiKey) {
           const resultText = data.candidates[0].content.parts[0].text;
           try {
             const parsed = JSON.parse(resultText);
-            results.plagiarismRate = parsed.plagiarism || 0;
-            results.aiProbability = parsed.ai || results.aiProbability;
+            if (parsed.plagiarism) {
+              results.plagiarismRate = Math.max(results.plagiarismRate, parsed.plagiarism);
+            }
+            if (parsed.ai) {
+              results.aiProbability = Math.max(results.aiProbability, parsed.ai);
+            }
             results.aiReasoning = parsed.reason || '분석 완료';
           } catch (e) {
             console.log('Gemini 응답 파싱 오류:', e);
@@ -83,13 +93,22 @@ async function detectPlagiarismAndAI(text, apiKey) {
     results.improvementSuggestions = generateBasicSuggestions(text, results.aiProbability);
 
     // 5. 메시지 생성
-    if (results.plagiarismRate > 0.7) {
+    const plagiarismPercent = Math.round(results.plagiarismRate * 100);
+    const aiPercent = Math.round(results.aiProbability * 100);
+    
+    if (plagiarismPercent > 70) {
       results.message = '⚠️ 높은 표절 가능성이 감지되었습니다.';
-    } else if (results.aiProbability > 0.7) {
+    } else if (aiPercent > 70) {
       results.message = '🤖 AI 생성 텍스트 특징이 다수 발견되었습니다.';
+    } else if (plagiarismPercent > 30 || aiPercent > 30) {
+      results.message = '📝 일부 개선이 필요한 부분이 있습니다.';
     } else {
       results.message = '✅ 전반적으로 양호한 텍스트입니다.';
     }
+
+    // 퍼센트 값으로 변환
+    results.plagiarismRate = plagiarismPercent;
+    results.aiProbability = aiPercent / 100; // Report 컴포넌트가 0-1 범위를 기대함
 
     // 임시 PDF URL (실제로는 생성하지 않음)
     results.pdfUrl = `/api/reports/report_${Date.now()}.pdf`;

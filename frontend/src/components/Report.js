@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ImprovementSuggestions from './ImprovementSuggestions';
 
 function Report({ data }) {
   const [showDetails, setShowDetails] = useState(false);
@@ -65,6 +66,12 @@ function Report({ data }) {
           📊 요약
         </button>
         <button 
+          className={`tab ${activeTab === 'improvements' ? 'active' : ''}`}
+          onClick={() => setActiveTab('improvements')}
+        >
+          ✨ 개선 제안
+        </button>
+        <button 
           className={`tab ${activeTab === 'text' ? 'active' : ''}`}
           onClick={() => setActiveTab('text')}
         >
@@ -92,6 +99,23 @@ function Report({ data }) {
               <span className="alert-icon">⚠️</span>
               <p>{data.message}</p>
             </div>
+
+            {/* 새로운 지표들 추가 */}
+            {data.authenticityScore && (
+              <div className="authenticity-score">
+                <h4>진정성 점수</h4>
+                <div className="score-display">
+                  <span className="score">{(data.authenticityScore * 100).toFixed(1)}%</span>
+                </div>
+              </div>
+            )}
+
+            {data.manipulationDetected && (
+              <div className="manipulation-warning">
+                <h4>⚠️ 조작 시도 감지</h4>
+                <p>텍스트에서 회피 시도가 감지되었습니다. 상세 분석 결과를 확인해주세요.</p>
+              </div>
+            )}
 
             {data.sources && data.sources.length > 0 && (
               <div className="quick-sources">
@@ -143,6 +167,10 @@ function Report({ data }) {
               </div>
             </div>
           </div>
+        )}
+
+        {activeTab === 'improvements' && (
+          <ImprovementSuggestions suggestions={data.improvementSuggestions} />
         )}
 
         {activeTab === 'text' && (
